@@ -6,7 +6,10 @@
 const express = require("express"); //Se importa el modulo express
 const router = express.Router(); //Se crea una instancia de Router de express
 const { ping } = require("../controllers/pingController"); //Se importa la funcion ping del controlador pingController
+const { login } = require("../controllers/loginController"); //Se importa la funcion login del controlador loginController
 
 router.get("/ping", ping); //Se crea una ruta que recibe un GET y llama a la funcion ping
+
+router.post("/login", login); //Se crea una ruta que recibe un POST y llama a la funcion login
 
 module.exports = router; //Se exporta el router para que pueda ser utilizado en otro archivo

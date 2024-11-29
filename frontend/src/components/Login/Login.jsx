@@ -13,12 +13,28 @@ const Login = () => {
    */
   const handdleLogin = (e) => {
     e.preventDefault();
-    // const username = e.target[0].value;
-    // const password = e.target[1].value;
-    console.log({
+    const data = {
       username: username,
       password: password,
-    });
+    };
+
+    // Hacer una solicitud POST a la API para iniciar sesión y manda las credeciales al servidor
+    fetch("http://localhost:3001/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json()) // Recibe la respuesta del servidor
+      .then((result) => {
+        // Muestra el resultado en la consola
+        console.log(result);
+      })
+      .catch((error) => {
+        // Muestra el error en la consola
+        console.error("Error:", error);
+      });
   };
 
   return (

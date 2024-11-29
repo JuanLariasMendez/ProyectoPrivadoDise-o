@@ -2,6 +2,8 @@ import "./Login.css";
 import { useState } from "react";
 import Home from "../Home/Home";
 
+import { Button } from "@/components/ui/button";
+
 const Login = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
@@ -70,9 +72,9 @@ const Login = () => {
               className="custom-input"
               type="password"
             />
-            <button className="custom-button" onClick={handdleLogin}>
+            <Button variant="outline" onClick={handdleLogin}>
               Login
-            </button>
+            </Button>
           </form>
         </div>
       )}

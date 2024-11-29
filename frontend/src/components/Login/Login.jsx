@@ -1,26 +1,11 @@
 import "./Login.css";
 import { useState } from "react";
-
-// Funcion para decodificar el token de autenticacion
-function parseJwt(token) {
-  const base64Url = token.split(".")[1];
-  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-  const jsonPayload = decodeURIComponent(
-    window
-      .atob(base64)
-      .split("")
-      .map(function (c) {
-        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-      })
-      .join("")
-  );
-
-  return JSON.parse(jsonPayload);
-}
+import Home from "../Home/Home";
 
 const Login = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [loginSuccessful, setLoginSuccess] = useState(false);
 
   /**
    * Maneja el evento de inicio de sesión.
@@ -45,8 +30,14 @@ const Login = () => {
     })
       .then((response) => response.json()) // Recibe la respuesta del servidor
       .then((result) => {
-        // Muestra el resultado en la consola
-        console.log(parseJwt(result.token)); // Decodifica el token de la autenticacion y lo muestra en la consola
+        //comprobamos si el token existe
+        if (result.toke) {
+          localStorage.setItem("token", result.token); //setteamos globalmente el token, ademas de que lo valida
+          setLoginSuccess(true);
+        } else {
+          setLoginSuccess(false);
+        }
+        //console.log(result.token); // Muestra el token de la autenticacion en la consola
       })
       .catch((error) => {
         // Muestra el error en la consola
@@ -55,31 +46,37 @@ const Login = () => {
   };
 
   return (
-    <div>
-      <form action="">
-        <label className="custom-label">Username:</label>
-        <input
-          onChange={(event) => {
-            setUsername(event.target.value);
-          }}
-          placeholder="username"
-          className="custom-input"
-          type="text"
-        />
-        <label className="custom-label">Password:</label>
-        <input
-          onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-          placeholder="password"
-          className="custom-input"
-          type="password"
-        />
-        <button type="submit" className="custom-button" onClick={handdleLogin}>
-          Login
-        </button>
-      </form>
-    </div>
+    <>
+      {loginSuccessful ? (
+        <Home />
+      ) : (
+        <div className="custom-form">
+          <form>
+            <label className="custom-label">Username:</label>
+            <input
+              onChange={(event) => {
+                setUsername(event.target.value);
+              }}
+              placeholder="username"
+              className="custom-input"
+              type="text"
+            />
+            <label className="custom-label">Password:</label>
+            <input
+              onChange={(event) => {
+                setPassword(event.target.value);
+              }}
+              placeholder="password"
+              className="custom-input"
+              type="password"
+            />
+            <button className="custom-button" onClick={handdleLogin}>
+              Login
+            </button>
+          </form>
+        </div>
+      )}
+    </>
   );
 };
 

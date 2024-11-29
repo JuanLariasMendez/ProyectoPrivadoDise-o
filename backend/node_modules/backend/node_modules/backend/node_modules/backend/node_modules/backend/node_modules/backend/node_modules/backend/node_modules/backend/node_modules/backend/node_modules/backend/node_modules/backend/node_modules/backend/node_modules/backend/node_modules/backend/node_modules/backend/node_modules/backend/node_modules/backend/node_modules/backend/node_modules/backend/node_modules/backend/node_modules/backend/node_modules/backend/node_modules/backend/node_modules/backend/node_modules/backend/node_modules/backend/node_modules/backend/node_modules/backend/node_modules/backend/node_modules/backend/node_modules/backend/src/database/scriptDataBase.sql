@@ -12,6 +12,6 @@ CREATE TABLE login (
 
 -- inserta los usuarios
 INSERT INTO login (username, password) VALUES
-('usuario1', 'password1'),
-('usuario2', 'password2'),
-('usuario3', 'password3');
+('user1', 'password1'),
+('user2', 'password2'),
+('user3', 'password3');

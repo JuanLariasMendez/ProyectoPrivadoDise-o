@@ -18,11 +18,15 @@ function parseJwt(token) {
   return JSON.parse(jsonPayload);
 }
 
-let tokenExistAndStillValid =
-  parseJwt(localStorage.getItem("token")).exp * 1000 > Date.now();
+let tokenExistAndStillValid = false;
+const token = localStorage.getItem("token");
+if (token) {
+  const parsedToken = parseJwt(token);
+  tokenExistAndStillValid = parsedToken.exp * 1000 > Date.now();
+}
 
 const Main = () => {
-  return <>{tokenExistAndStillValid ? <Home /> : <Login />}</>;
+  return <>{tokenExistAndStillValid ? <Home /> : <Login />}</>; // Si el token existe y es valido, se muestra la pagina principal, de lo contrario se muestra la pagina de login
 };
 
 export default Main;

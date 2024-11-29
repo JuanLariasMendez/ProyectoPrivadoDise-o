@@ -31,7 +31,7 @@ const Login = () => {
       .then((response) => response.json()) // Recibe la respuesta del servidor
       .then((result) => {
         //comprobamos si el token existe
-        if (result.toke) {
+        if (result.token) {
           localStorage.setItem("token", result.token); //setteamos globalmente el token, ademas de que lo valida
           setLoginSuccess(true);
         } else {

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { api } from "@/utils/api";
 import {
   BarChart,
   Bar,
@@ -10,48 +11,19 @@ import {
 } from "recharts";
 
 const Home = () => {
+  const [projects, setProjects] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [newProject, setNewProject] = useState({
     nombre: "",
     descripcion: "",
     fecha_inicio: "",
     fecha_fin: "",
+    id_creador: 1, // Por ahora hardcodeado, después se puede obtener del contexto de usuario
   });
 
-  const projects = [
-    {
-      id: 1,
-      nombre: "Biblioteca",
-      descripcion: "Organizar libros de la biblioteca",
-      fecha_inicio: "2024-11-29",
-      fecha_fin: "2024-12-29",
-      id_creador: 1,
-    },
-    {
-      id: 2,
-      nombre: "Banco de Alimentos",
-      descripcion: "Recolectar alimentos para donación",
-      fecha_inicio: "2024-01-15",
-      fecha_fin: "2024-04-30",
-      id_creador: 2,
-    },
-  ];
-
-  const handleCreateProject = () => {
-    // Aquí irían las lógicas para crear un nuevo proyecto
-    console.log("Nuevo proyecto:", newProject);
-    setShowModal(false);
-  };
-
-  const handleEditProject = (project) => {
-    // Aquí irían las lógicas para editar un proyecto existente
-    console.log("Editar proyecto:", project);
-  };
-
-  const handleDeleteProject = (project) => {
-    // Aquí irían las lógicas para eliminar un proyecto existente
-    console.log("Eliminar proyecto:", project);
-  };
+  const [tests, setTests] = useState([]);
 
   const [newTest, setNewTest] = useState({
     id_proyecto: "",
@@ -60,37 +32,107 @@ const Home = () => {
     fecha_creacion: "",
   });
 
-  const tests = [
-    {
-      id: 1,
-      id_proyecto: 1,
-      descripcion: "Prueba técnica",
-      estado: "Pendiente",
-      fecha_creacion: "2024-11-29 23:02:17",
-    },
-    {
-      id: 2,
-      id_proyecto: 2,
-      descripcion: "Prueba de funcionalidad",
-      estado: "Pendiente",
-      fecha_creacion: "2024-10-15 14:30:00",
-    },
-  ];
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    loadProjects();
+    loadTests();
+  }, []);
 
-  const handleCreateTest = () => {
-    // Aquí irían las lógicas para crear una nueva prueba
-    console.log("Nueva prueba:", newTest);
-    setShowModal(false);
+  // Funciones para proyectos
+  const loadProjects = async () => {
+    try {
+      setIsLoading(true);
+      const data = await api.getProjects();
+      setProjects(data);
+    } catch (error) {
+      console.error("Error al cargar proyectos:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleEditTest = (test) => {
-    // Aquí irían las lógicas para editar una prueba existente
-    console.log("Editar prueba:", test);
+  const handleOpenEditModal = (project) => {
+    setEditingProject(project);
+    setNewProject(project);
+    setShowModal(true);
   };
 
-  const handleDeleteTest = (test) => {
-    // Aquí irían las lógicas para eliminar una prueba existente
-    console.log("Eliminar prueba:", test);
+  const handleSubmitProject = async () => {
+    try {
+      if (editingProject) {
+        await api.updateProject(editingProject.id_proyecto, newProject);
+      } else {
+        await api.createProject(newProject);
+      }
+      setShowModal(false);
+      setEditingProject(null);
+      setNewProject({
+        nombre: "",
+        descripcion: "",
+        fecha_inicio: "",
+        fecha_fin: "",
+        id_creador: 1,
+      });
+      loadProjects();
+    } catch (error) {
+      console.error("Error al guardar proyecto:", error);
+    }
+  };
+
+  const handleDeleteProject = async (project) => {
+    if (window.confirm("¿Estás seguro de eliminar este proyecto?")) {
+      try {
+        await api.deleteProject(project.id_proyecto);
+        loadProjects();
+      } catch (error) {
+        console.error("Error al eliminar proyecto:", error);
+      }
+    }
+  };
+
+  // Función auxiliar para formatear fechas
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0];
+  };
+
+  // Funciones para pruebas
+  const loadTests = async () => {
+    try {
+      const data = await api.getTests();
+      setTests(data);
+    } catch (error) {
+      console.error("Error al cargar pruebas:", error);
+    }
+  };
+
+  const handleCreateTest = async () => {
+    try {
+      await api.createTest(newTest);
+      setShowModal(false);
+      loadTests();
+    } catch (error) {
+      console.error("Error al crear prueba:", error);
+    }
+  };
+
+  const handleEditTest = async (test) => {
+    try {
+      await api.updateTest(test.id, test);
+      loadTests();
+    } catch (error) {
+      console.error("Error al editar prueba:", error);
+    }
+  };
+
+  const handleDeleteTest = async (test) => {
+    try {
+      await api.deleteTest(test.id);
+      loadTests();
+    } catch (error) {
+      console.error("Error al eliminar prueba:", error);
+    }
   };
 
   const metricsData = [
@@ -110,7 +152,17 @@ const Home = () => {
             <h2 className="text-2xl font-bold">Proyectos</h2>
             <button
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={() => setShowModal(true)}
+              onClick={() => {
+                setEditingProject(null);
+                setNewProject({
+                  nombre: "",
+                  descripcion: "",
+                  fecha_inicio: "",
+                  fecha_fin: "",
+                  id_creador: 1,
+                });
+                setShowModal(true);
+              }}
             >
               Nuevo Proyecto
             </button>
@@ -127,32 +179,46 @@ const Home = () => {
                 </tr>
               </thead>
               <tbody>
-                {projects.map((project) => (
-                  <tr key={project.id}>
-                    <td className="p-2 border">{project.nombre}</td>
-                    <td className="p-2 border">{project.descripcion}</td>
-                    <td className="p-2 border text-center">
-                      {project.fecha_inicio}
-                    </td>
-                    <td className="p-2 border text-center">
-                      {project.fecha_fin}
-                    </td>
-                    <td className="p-2 border text-center">
-                      <button
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
-                        onClick={() => handleEditProject(project)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
-                        onClick={() => handleDeleteProject(project)}
-                      >
-                        Eliminar
-                      </button>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="5" className="text-center p-4">
+                      Cargando...
                     </td>
                   </tr>
-                ))}
+                ) : projects.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center p-4">
+                      No hay proyectos disponibles
+                    </td>
+                  </tr>
+                ) : (
+                  projects.map((project) => (
+                    <tr key={project.id_proyecto}>
+                      <td className="p-2 border">{project.nombre}</td>
+                      <td className="p-2 border">{project.descripcion}</td>
+                      <td className="p-2 border text-center">
+                        {formatDate(project.fecha_inicio)}
+                      </td>
+                      <td className="p-2 border text-center">
+                        {formatDate(project.fecha_fin)}
+                      </td>
+                      <td className="p-2 border text-center">
+                        <button
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2"
+                          onClick={() => handleOpenEditModal(project)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"
+                          onClick={() => handleDeleteProject(project)}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -160,7 +226,9 @@ const Home = () => {
           {showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
               <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-                <h3 className="text-2xl font-bold mb-4">Nuevo Proyecto</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                  {editingProject ? "Editar Proyecto" : "Nuevo Proyecto"}
+                </h3>
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="nombre" className="block font-medium mb-1">
@@ -239,13 +307,16 @@ const Home = () => {
                 <div className="flex justify-end mt-4">
                   <button
                     className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-2"
-                    onClick={handleCreateProject}
+                    onClick={handleSubmitProject}
                   >
-                    Crear Proyecto
+                    {editingProject ? "Guardar Cambios" : "Crear Proyecto"}
                   </button>
                   <button
                     className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded"
-                    onClick={() => setShowModal(false)}
+                    onClick={() => {
+                      setShowModal(false);
+                      setEditingProject(null);
+                    }}
                   >
                     Cancelar
                   </button>
@@ -497,13 +568,16 @@ const Home = () => {
             <div className="flex justify-end mt-4">
               <button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mr-2"
-                onClick={handleCreateProject}
+                onClick={handleSubmitProject}
               >
-                Crear Proyecto
+                {editingProject ? "Guardar Cambios" : "Crear Proyecto"}
               </button>
               <button
                 className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setEditingProject(null);
+                }}
               >
                 Cancelar
               </button>

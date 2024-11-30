@@ -11,12 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-
 const Login = () => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loginSuccessful, setLoginSuccess] = useState(false);
-
   /**
    * Maneja el evento de inicio de sesión.
    *
@@ -29,7 +27,6 @@ const Login = () => {
       username: username,
       password: password,
     };
-
     // Hacer una solicitud POST a la API para iniciar sesión y manda las credeciales al servidor
     fetch("http://localhost:3000/login", {
       method: "POST",
@@ -54,7 +51,6 @@ const Login = () => {
         console.error("Error:", error);
       });
   };
-
   return (
     <>
       {loginSuccessful ? (
@@ -103,5 +99,4 @@ const Login = () => {
     </>
   );
 };
-
 export default Login;

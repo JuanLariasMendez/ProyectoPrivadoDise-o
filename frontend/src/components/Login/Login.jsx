@@ -1,8 +1,16 @@
 import "./Login.css";
 import { useState } from "react";
 import Home from "../Home/Home";
-
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 const Login = () => {
   const [password, setPassword] = useState("");
@@ -52,30 +60,44 @@ const Login = () => {
       {loginSuccessful ? (
         <Home />
       ) : (
-        <div className="custom-form">
-          <form>
-            <label className="custom-label">Username:</label>
-            <input
-              onChange={(event) => {
-                setUsername(event.target.value);
-              }}
-              placeholder="username"
-              className="custom-input"
-              type="text"
-            />
-            <label className="custom-label">Password:</label>
-            <input
-              onChange={(event) => {
-                setPassword(event.target.value);
-              }}
-              placeholder="password"
-              className="custom-input"
-              type="password"
-            />
-            <Button variant="outline" onClick={handdleLogin}>
-              Login
-            </Button>
-          </form>
+        <div className="grid h-screen w-screen place-items-center bg-gray-50">
+          <Card className="w-[400px] shadow-lg">
+            <CardHeader>
+              <CardTitle>Inicio de Sesión</CardTitle>
+              <CardDescription>
+                Ingresa tus credenciales para acceder al sistema.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Username</label>
+                  <Input
+                    type="text"
+                    placeholder="Enter your username"
+                    onChange={(event) => setUsername(event.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Password</label>
+                  <Input
+                    type="password"
+                    placeholder="Enter your password"
+                    onChange={(event) => setPassword(event.target.value)}
+                  />
+                </div>
+              </form>
+            </CardContent>
+            <CardFooter>
+              <Button
+                className="w-full"
+                variant="default"
+                onClick={handdleLogin}
+              >
+                Login
+              </Button>
+            </CardFooter>
+          </Card>
         </div>
       )}
     </>

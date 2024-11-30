@@ -7,9 +7,16 @@ const express = require("express"); //Se importa el modulo express
 const router = express.Router(); //Se crea una instancia de Router de express
 const { ping } = require("../controllers/pingController"); //Se importa la funcion ping del controlador pingController
 const { login } = require("../controllers/loginController"); //Se importa la funcion login del controlador loginController
+const projectsController = require("../controllers/projectsController"); //Se importa el controlador de proyectos
 
+// Rutas existentes
 router.get("/ping", ping); //Se crea una ruta que recibe un GET y llama a la funcion ping
-
 router.post("/login", login); //Se crea una ruta que recibe un POST y llama a la funcion login
+
+// Rutas de proyectos
+router.get("/projects", projectsController.getProjects);
+router.post("/projects", projectsController.createProject);
+router.put("/projects/:id_proyecto", projectsController.updateProject);
+router.delete("/projects/:id_proyecto", projectsController.deleteProject);
 
 module.exports = router; //Se exporta el router para que pueda ser utilizado en otro archivo

@@ -1,7 +1,7 @@
 const connection = require("../models/db"); // Usamos la misma conexión que otros controladores
 
-// Obtener todos los proyectos
-module.exports.getProjects = (req, res) => {
+// Funciones del controlador
+const getProjects = (req, res) => {
   const consult = "SELECT * FROM proyectos";
   try {
     connection.query(consult, (err, results) => {
@@ -18,8 +18,7 @@ module.exports.getProjects = (req, res) => {
   }
 };
 
-// Crear un nuevo proyecto
-module.exports.createProject = (req, res) => {
+const createProject = (req, res) => {
   const { nombre, descripcion, fecha_inicio, fecha_fin, id_creador } = req.body;
   const consult =
     "INSERT INTO proyectos (nombre, descripcion, fecha_inicio, fecha_fin, id_creador) VALUES (?, ?, ?, ?, ?)";
@@ -50,8 +49,7 @@ module.exports.createProject = (req, res) => {
   }
 };
 
-// Actualizar un proyecto
-module.exports.updateProject = (req, res) => {
+const updateProject = (req, res) => {
   const { id_proyecto } = req.params;
   const { nombre, descripcion, fecha_inicio, fecha_fin, id_creador } = req.body;
   const consult =
@@ -86,8 +84,7 @@ module.exports.updateProject = (req, res) => {
   }
 };
 
-// Eliminar un proyecto
-module.exports.deleteProject = (req, res) => {
+const deleteProject = (req, res) => {
   const { id_proyecto } = req.params;
   const consult = "DELETE FROM proyectos WHERE id_proyecto = ?";
 
@@ -105,4 +102,12 @@ module.exports.deleteProject = (req, res) => {
   } catch (e) {
     res.status(500).json({ error: "Error interno del servidor" });
   }
+};
+
+// Exportación de las funciones
+module.exports = {
+  getProjects,
+  createProject,
+  updateProject,
+  deleteProject,
 };

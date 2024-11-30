@@ -9,6 +9,7 @@ const { ping } = require("../controllers/pingController"); //Se importa la funci
 const { login } = require("../controllers/loginController"); //Se importa la funcion login del controlador loginController
 const projectsController = require("../controllers/projectsController"); //Se importa el controlador de proyectos
 const testsController = require("../controllers/testsController"); //Se importa el controlador de pruebas
+const reportsController = require("../controllers/reportsController"); //Se importa el controlador de reportes
 
 // Rutas existentes
 router.get("/ping", ping); //Se crea una ruta que recibe un GET y llama a la funcion ping
@@ -25,5 +26,8 @@ router.get("/tests", testsController.getTests);
 router.post("/tests", testsController.createTest);
 router.put("/tests/:id_prueba", testsController.updateTest);
 router.delete("/tests/:id_prueba", testsController.deleteTest);
+
+// Rutas de reportes
+router.get("/reports/progress", reportsController.getMonthProgress);
 
 module.exports = router; //Se exporta el router para que pueda ser utilizado en otro archivo

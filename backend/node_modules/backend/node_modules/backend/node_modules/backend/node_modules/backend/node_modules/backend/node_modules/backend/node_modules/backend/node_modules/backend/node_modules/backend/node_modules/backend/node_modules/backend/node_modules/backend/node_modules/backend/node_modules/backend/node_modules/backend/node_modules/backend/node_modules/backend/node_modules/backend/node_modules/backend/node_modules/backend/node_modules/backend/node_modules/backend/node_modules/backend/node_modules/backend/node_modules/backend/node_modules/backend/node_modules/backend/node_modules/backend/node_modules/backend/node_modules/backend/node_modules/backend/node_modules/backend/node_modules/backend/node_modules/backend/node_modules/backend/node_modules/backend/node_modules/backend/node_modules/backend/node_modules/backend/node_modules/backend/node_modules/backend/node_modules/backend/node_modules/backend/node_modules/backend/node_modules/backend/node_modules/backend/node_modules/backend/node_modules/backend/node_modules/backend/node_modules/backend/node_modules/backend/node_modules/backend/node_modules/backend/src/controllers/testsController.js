@@ -1,7 +1,7 @@
 const connection = require("../models/db");
 
-// Obtener todas las pruebas
-module.exports.getTests = (req, res) => {
+// Funciones del controlador
+const getTests = (req, res) => {
   const consult = "SELECT * FROM pruebas";
   try {
     connection.query(consult, (err, results) => {
@@ -16,8 +16,7 @@ module.exports.getTests = (req, res) => {
   }
 };
 
-// Crear una nueva prueba
-module.exports.createTest = (req, res) => {
+const createTest = (req, res) => {
   const { id_proyecto, descripcion, estado } = req.body;
   const consult =
     "INSERT INTO pruebas (id_proyecto, descripcion, estado) VALUES (?, ?, ?)";
@@ -47,8 +46,7 @@ module.exports.createTest = (req, res) => {
   }
 };
 
-// Actualizar una prueba
-module.exports.updateTest = (req, res) => {
+const updateTest = (req, res) => {
   const { id_prueba } = req.params;
   const { id_proyecto, descripcion, estado } = req.body;
   const consult =
@@ -81,8 +79,7 @@ module.exports.updateTest = (req, res) => {
   }
 };
 
-// Eliminar una prueba
-module.exports.deleteTest = (req, res) => {
+const deleteTest = (req, res) => {
   const { id_prueba } = req.params;
   const consult = "DELETE FROM pruebas WHERE id_prueba = ?";
 
@@ -100,4 +97,12 @@ module.exports.deleteTest = (req, res) => {
   } catch (e) {
     res.status(500).json({ error: "Error interno del servidor" });
   }
+};
+
+// Exportación de las funciones
+module.exports = {
+  getTests,
+  createTest,
+  updateTest,
+  deleteTest,
 };
